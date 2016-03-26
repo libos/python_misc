@@ -2,10 +2,8 @@ import os
 
 ###### 必须加在urllib2之前
 ###### 还必须pip install PySocks
-###### 这是全部的都用代理，应该把这部分加到download_image里的，第一次下载不用proxy，第二次之后用proxy
+###### Python库 https://github.com/Anorov/PySocks
 import socket
-socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 65531)
-socket.socket = socks.socksocket
 ###### 
 import urllib2
 import httplib
@@ -15,6 +13,15 @@ import multiprocessing
 
 def download_image(url, save_name,proxy = None):
 	try:
+		### 添加开关了
+		####### 可能是对的........我没运行，你试一下
+		if proxy is not None:
+			socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 65531)
+			socket.socket = socks.socksocket
+		else:
+			socks.set_default_proxy()
+			socket.socket = socks.socksocket
+			
 		fp = urllib2.urlopen(url, timeout=20)
 		data = fp.read()
 		fp.close()
@@ -58,7 +65,7 @@ def readList((list_path, save_path, log_path)):
 		#########  这里应该判断flag，如果有问题，那么重新下载，不然才记录
 		retrytimes = 0
 		while not flag:
-			flag = download_image(url, filename)
+			flag = download_image(url, filename,True)
 			retrytimes = retrytimes + 1
 			if retrytimes > 5:
 				break
